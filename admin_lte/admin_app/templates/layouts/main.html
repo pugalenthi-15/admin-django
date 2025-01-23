@@ -1,0 +1,8 @@
+{% include 'layouts/header.html' %} 
+{% include 'layouts/sidebar.html' %}
+<main class="app-main">
+  {% block content %}
+  <!-- Default body content if not overridden -->
+  {% endblock %}
+</main>
+{% include 'layouts/footer.html' %}
