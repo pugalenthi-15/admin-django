@@ -1,32 +1,29 @@
-{% extends 'layouts/main.html' %}: {% block content %}
+{% extends 'layouts/main.html' %}
+
+{% block content %}
 <div class="app-content-header">
-  <!--begin::Container-->
   <div class="container-fluid">
-    <!--begin::Row-->
     <div class="row">
       <div class="col-sm-6"><h3 class="mb-0"></h3></div>
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-end">
           <li class="breadcrumb-item">
-            <a href="{% url 'dashboard'%}">Home</a>
+            <a href="{% url 'dashboard' %}">Home</a>
           </li>
           <li class="breadcrumb-item active" aria-current="page">User Roles</li>
         </ol>
       </div>
     </div>
-    <!--end::Row-->
   </div>
-  <!--end::Container-->
 </div>
+
 <div class="app-content">
-  <!--begin::Container-->
   <div class="container-fluid">
     <div class="col-md-12">
       <div class="card mb-4">
         <div class="card-header">
           <h3 class="card-title">{{ page_title }}</h3>
         </div>
-        <!-- /.card-header -->
         <div class="card-body">
           <table class="table table-bordered">
             <thead>
@@ -34,11 +31,10 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Status</th>
-                <!-- <th>Actions</th> -->
               </tr>
             </thead>
             <tbody>
-              {% for role in user_roles %}
+              {% for role in data %}
               <tr class="align-middle">
                 <td>{{ forloop.counter }}</td>
                 <td>{{ role.name }}</td>
@@ -49,33 +45,42 @@
                   <span class="badge bg-danger">Inactive</span>
                   {% endif %}
                 </td>
-                <!-- <td>
-                  <a href="#" class="btn btn-primary">
-                    <i class="fas fa-edit"></i> 
-                  </a>
-                  <a href="#" class="btn btn-danger">
-                    <i class="fas fa-trash-alt"></i> 
-                  </a>
-                </td> -->
               </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
-        <!-- /.card-body -->
+        
+        <!-- Pagination Controls -->
         <div class="card-footer clearfix">
           <ul class="pagination pagination-sm m-0 float-end">
-            <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+            {% if page_obj.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page=1">&laquo;</a></li>
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+              <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">»</a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Next</span></li>
+              <li class="page-item disabled"><span class="page-link">»</span></li>
+            {% endif %}
           </ul>
         </div>
       </div>
-      <!-- /.card -->
     </div>
-    <!--end::Container-->
   </div>
-  {% endblock %}
 </div>
+{% endblock %}

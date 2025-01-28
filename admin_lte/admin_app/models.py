@@ -3,6 +3,7 @@ import uuid
 from django.contrib.auth.models import User,AbstractBaseUser
 
 class UserRole(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, null=True)  # UUID field
     name = models.CharField(max_length=255, unique=True)  # Role name
     status = models.BooleanField(default=1)  # Active status
     created_at = models.DateTimeField(
@@ -43,6 +44,27 @@ class CustomUser(AbstractBaseUser):
 
     USERNAME_FIELD = 'email'  # Define the unique field for authentication
     REQUIRED_FIELDS = ['name']  # Define the fields that are required for creating a user
+
+    def __str__(self):
+        return self.name
+    
+#state table
+class State(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, null=True)  # UUID field
+    name = models.CharField(max_length=255, unique=True)  # Role name
+    status = models.BooleanField(default=1)  # Active status
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )  # Timestamp when the role was created
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )  # Timestamp when the role was last updated
+    created_by = models.ForeignKey(
+        CustomUser, on_delete=models.SET_NULL, null=True, related_name="state_created_by"
+    )  # Reference to the user who created the role
+    updated_by = models.ForeignKey(
+        CustomUser, on_delete=models.SET_NULL, null=True, related_name="state_updated_by"
+    )  # Reference to the user who last updated the role
 
     def __str__(self):
         return self.name

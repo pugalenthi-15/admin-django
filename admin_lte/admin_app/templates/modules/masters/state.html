@@ -25,20 +25,26 @@
   <div class="container-fluid">
     <div class="col-md-12">
       <div class="card mb-4">
-        <div class="card-header">
-          <h3 class="card-title">{{ page_title }}</h3>
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="card-title mb-0 me-auto">{{ page_title }}</h5>
+          <button
+            type="button"
+            class="btn btn-success waves-effect waves-light"
+          >
+            <i class="ri-add-circle-line align-middle me-1"></i>Add New
+          </button>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-           <table class="table table-bordered">
+          <table class="table table-bordered">
             <thead>
               <tr>
                 <th>#</th>
                 <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
                 <th>Status</th>
-                <!-- <th>Actions</th> -->
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -46,8 +52,7 @@
               <tr class="align-middle">
                 <td>{{ forloop.counter }}</td>
                 <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role.name }}</td>
+
                 <td>
                   {% if user.status %}
                   <span class="badge bg-success">Active</span>
@@ -55,14 +60,14 @@
                   <span class="badge bg-danger">Inactive</span>
                   {% endif %}
                 </td>
-                <!-- <td>
+                <td>
                   <a href="#" class="btn btn-primary">
                     <i class="fas fa-edit"></i>
                   </a>
                   <a href="#" class="btn btn-danger">
                     <i class="fas fa-trash-alt"></i>
                   </a>
-                </td> -->
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -72,27 +77,50 @@
         <div class="card-footer clearfix">
           <ul class="pagination pagination-sm m-0 float-end">
             {% if page_obj.has_previous %}
-              <li class="page-item"><a class="page-link" href="?page=1">&laquo;</a></li>
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            <li class="page-item">
+              <a class="page-link" href="?page=1">&laquo;</a>
+            </li>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="?page={{ page_obj.previous_page_number }}"
+                >Previous</a
+              >
+            </li>
             {% else %}
-              <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-              <li class="page-item disabled"><span class="page-link">Previous</span></li>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-              {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-              {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">»</a></li>
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">Previous</span>
+            </li>
+            {% endif %} {% for num in page_obj.paginator.page_range %} {% if
+            page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
             {% else %}
-              <li class="page-item disabled"><span class="page-link">Next</span></li>
-              <li class="page-item disabled"><span class="page-link">»</span></li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %} {% endfor %} {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}"
+                >Next</a
+              >
+            </li>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="?page={{ page_obj.paginator.num_pages }}"
+                >»</a
+              >
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Next</span>
+            </li>
+            <li class="page-item disabled"><span class="page-link">»</span></li>
             {% endif %}
           </ul>
         </div>
