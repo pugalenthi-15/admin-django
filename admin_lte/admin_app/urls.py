@@ -7,6 +7,11 @@ urlpatterns = [
     path("logout", views.logout_page, name="logout"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("state/", views.state, name="state"),
+    path("state/create", views.state_create, name="state_create"),
+    path("state/add-state", views.add_state, name="add-state"),
+    path("state/<int:state_id>/edit/", views.state_edit, name="state_edit"),
+    path("state/update/<int:state_id>", views.state_update, name="state_update"),
+    path("state/delete/<int:state_id>/", views.state_delete, name="state_delete"),
     path("users/", views.users, name="users"),
     path("user_role/", views.user_role, name="user_role"),
 ]

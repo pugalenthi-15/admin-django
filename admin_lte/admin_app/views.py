@@ -7,7 +7,6 @@ import json
 from django.core.paginator import Paginator
 
 
-
 # def main(request):
 #     return render(request,"layouts/main.html")
 def dashboard(request):
@@ -35,7 +34,8 @@ def login_view(request):
                     return JsonResponse({"success": True}, status=200)
                 else:
                     return JsonResponse(
-                        {"success": False, "error": "Invalid email or password"}, status=422
+                        {"success": False, "error": "Invalid email or password"},
+                        status=422,
                     )
 
             except CustomUser.DoesNotExist:
@@ -68,6 +68,7 @@ def users(request):
     }
     return render(request, "modules/masters/users.html", context)
 
+
 def state(request):
     page_obj = paginate_model(request, State)
     context = {
@@ -77,6 +78,109 @@ def state(request):
     }
     return render(request, "modules/masters/state.html", context)
 
+
+def state_create(request):
+    context = {
+        "module_name": "State",
+        "module_function": "Add",
+        "method": "POST",
+        "route": "add-state",
+    }
+    # print(context)
+    return render(request, "modules/masters/state/add.html", context)
+
+
+def add_state(request):
+    if (
+        request.method != "POST"
+        or request.headers.get("X-Requested-With") != "XMLHttpRequest"
+    ):
+        return JsonResponse(
+            {"status": "error", "message": "Invalid request"}, status=400
+        )
+
+    try:
+        data = json.loads(request.body)
+        name = data.get("name", "").strip()
+        status = int(data.get("status", 1))
+
+        if not name:
+            return JsonResponse(
+                {"status": "error", "message": "State name is required"}, status=422
+            )
+
+        State.objects.create(name=name, status=status)
+
+        return JsonResponse(
+            {"status": "success", "message": "State added successfully!"}, status=200
+        )
+
+    except Exception as e:
+        return JsonResponse(
+            {"status": "error", "message": f"An error occurred: {str(e)}"}, status=500
+        )
+
+
+def state_edit(request, state_id):
+    try:
+        state = State.objects.get(id=state_id)
+        context = {
+            "module_name": "State",
+            "module_function": "Edit",
+            "method": "PUT",
+            "route": f"update/{state.id}",
+            "data": state,
+        }
+        # print(context)
+        return render(request, "modules/masters/state/add.html", context)
+    except State.DoesNotExist:
+        return redirect("state_list")  # Redirect to the state list page if not found
+
+def state_update(request, state_id):
+    if (request.method != "PUT"
+        or request.headers.get("X-Requested-With") != "XMLHttpRequest"):
+        return JsonResponse(
+            {"status": "error", "message": "Invalid request"}, status=400
+        )
+
+    try:
+        data = json.loads(request.body)
+        name = data.get("name", "").strip()
+        status = int(data.get("status", 0))
+
+        if not name:
+            return JsonResponse(
+                {"status": "error", "message": "State name is required"}, status=422
+            )
+
+        state = State.objects.get(id=state_id)
+        state.name = name
+        state.status = status
+        state.save()
+
+        return JsonResponse(
+            {"status": "success", "message": "State updated successfully!"}, status=200
+        )
+
+    except State.DoesNotExist:
+        return JsonResponse(
+            {"status": "error", "message": "State not found"}, status=404
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"status": "error", "message": f"An error occurred: {str(e)}"}, status=500
+        )
+
+def state_delete(request, state_id):
+    print("hai")
+    if request.method == 'DELETE':
+        try:
+            item = State.objects.get(id=state_id)
+            item.delete()
+            return JsonResponse({'message': 'Item deleted successfully'}, status=200)
+        except State.DoesNotExist:
+            return JsonResponse({'error': 'Item not found'}, status=404)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def user_role(request):
     page_obj = paginate_model(request, UserRole)

@@ -1,14 +1,22 @@
-{% extends 'layouts/main.html' %}: {% block content %}
+{% extends 'layouts/main.html' %}
+{% block content %}
 <div class="app-content-header">
   <!--begin::Container-->
   <div class="container-fluid">
+    <div class="modal fade" id="modal-sm" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" id="modal-content">
+
+            </div>
+        </div>
+    </div>  
     <!--begin::Row-->
     <div class="row">
       <div class="col-sm-6"><h3 class="mb-0"></h3></div>
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-end">
           <li class="breadcrumb-item">
-            <a href="{% url 'dashboard'%}">Home</a>
+            <a href="{% url 'dashboard' %}">Home</a>
           </li>
           <li class="breadcrumb-item active" aria-current="page">
             {{ page_title }}
@@ -25,16 +33,11 @@
   <div class="container-fluid">
     <div class="col-md-12">
       <div class="card mb-4">
-        <div
-          class="card-header d-flex justify-content-between align-items-center"
-        >
+        <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="card-title mb-0 me-auto">{{ page_title }}</h5>
-          <button
-            type="button"
-            class="btn btn-success waves-effect waves-light"
-          >
-            <i class="ri-add-circle-line align-middle me-1"></i>Add New
-          </button>
+          <button onclick="addEditModal('', 'state', 'create', 'GET')" type="button" class="btn btn-success">
+            <i class="ri-add-circle-line align-middle me-1"></i> Add New
+        </button>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
@@ -48,26 +51,29 @@
               </tr>
             </thead>
             <tbody>
-              {% for user in data %}
+              {% for state in data %}
               <tr class="align-middle">
                 <td>{{ forloop.counter }}</td>
-                <td>{{ user.name }}</td>
-
+                <td>{{ state.name }}</td>
                 <td>
-                  {% if user.status %}
+                  {% if state.status %}
                   <span class="badge bg-success">Active</span>
                   {% else %}
                   <span class="badge bg-danger">Inactive</span>
                   {% endif %}
                 </td>
                 <td>
-                  <a href="#" class="btn btn-primary">
+                  <a href="#" onclick="addEditModal({{ state.id }}, 'state', 'edit', 'GET')" class="btn btn-primary">
                     <i class="fas fa-edit"></i>
                   </a>
-                  <a href="#" class="btn btn-danger">
+                  <a href="#" class="btn btn-danger delete-btn" data-id="{{ state.id }}">
                     <i class="fas fa-trash-alt"></i>
-                  </a>
-                </td>
+                </a>
+                </td> 
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4">No users found.</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -81,11 +87,7 @@
               <a class="page-link" href="?page=1">&laquo;</a>
             </li>
             <li class="page-item">
-              <a
-                class="page-link"
-                href="?page={{ page_obj.previous_page_number }}"
-                >Previous</a
-              >
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
             </li>
             {% else %}
             <li class="page-item disabled">
@@ -94,8 +96,9 @@
             <li class="page-item disabled">
               <span class="page-link">Previous</span>
             </li>
-            {% endif %} {% for num in page_obj.paginator.page_range %} {% if
-            page_obj.number == num %}
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
             <li class="page-item active">
               <span class="page-link">{{ num }}</span>
             </li>
@@ -103,24 +106,22 @@
             <li class="page-item">
               <a class="page-link" href="?page={{ num }}">{{ num }}</a>
             </li>
-            {% endif %} {% endfor %} {% if page_obj.has_next %}
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}"
-                >Next</a
-              >
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
             </li>
             <li class="page-item">
-              <a
-                class="page-link"
-                href="?page={{ page_obj.paginator.num_pages }}"
-                >»</a
-              >
+              <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">»</a>
             </li>
             {% else %}
             <li class="page-item disabled">
               <span class="page-link">Next</span>
             </li>
-            <li class="page-item disabled"><span class="page-link">»</span></li>
+            <li class="page-item disabled">
+              <span class="page-link">»</span>
+            </li>
             {% endif %}
           </ul>
         </div>
