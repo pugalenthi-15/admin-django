@@ -4,27 +4,42 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".delete-btn").forEach((button) => {
       button.addEventListener("click", function (event) {
           event.preventDefault();
+          
           let itemId = this.getAttribute("data-id");
+          let itemurl = this.getAttribute("data-url");
+          let entityType = this.getAttribute("data-entity") || "item"; // Define entityType if not set
 
-          if (!confirm("Are you sure you want to delete this state?")) return;
-
-          fetch(`/state/delete/${itemId}/`, {
-              method: "DELETE",
-              headers: {
-                  "X-CSRFToken": getCSRFToken(),
-                  "Content-Type": "application/json",
-              },
-          })
-              .then((response) => response.json())
-              .then((data) => {
-                  if (data.message) {
-                      // alert(data.message);
-                      location.reload();
-                  } else {
-                      alert(data.error);
-                  }
-              })
-              .catch((error) => console.error("Error:", error));
+          Swal.fire({
+              title: "Are you sure?",
+              text: `You want to delete this ${entityType}.`,
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "Delete!",
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  fetch(`/${itemurl}/delete/${itemId}/`, {
+                      method: "DELETE",
+                      headers: {
+                          "X-CSRFToken": getCSRFToken(),
+                          "Content-Type": "application/json",
+                      },
+                  })
+                  .then((response) => response.json())
+                  .then((data) => {
+                      if (data.message) {
+                          location.reload();
+                      } else {
+                          Swal.fire("Error", data.error, "error");
+                      }
+                  })
+                  .catch((error) => {
+                      console.error("Error:", error);
+                      Swal.fire("Error", "Something went wrong!", "error");
+                  });
+              }
+          });
       });
   });
 });
@@ -43,44 +58,6 @@ function getCSRFToken() {
   return cookieValue;
 }
 
-
-// function handleSubmit(event) {
-//   // Prevent form from submitting the traditional way
-//   event.preventDefault();
-
-//   // Collect form data dynamically
-//   const formData = new FormData(document.getElementById("user-form"));
-
-//   // Prepare the request payload dynamically
-//   const data = {};
-//   formData.forEach((value, key) => {
-//     data[key] = value;  // Assign each form element's name and value to the data object
-//   });
- 
-//   // Send the request using fetch
-//   fetch("/add-state/", {
-//     method: "POST",
-//     headers: {
-//       "X-Requested-With": "XMLHttpRequest",
-//       "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value, // CSRF Token
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(data), // Send the data as JSON
-//   })
-//     .then((response) => response.json())
-//     .then((data) => {
-//       if (data.status === "success") {
-//         // alert("State added successfully!");
-//         location.reload(); // Reload the page or update the UI accordingly
-//       } else {
-//         console.error(data.message || "An error occurred.");
-//       }
-//     })
-//     .catch((error) => {
-//       console.error("Error:", error);
-//       alert("An error occurred.");
-//     });
-// }
 
 function handleSubmit(event) {
   event.preventDefault();
@@ -146,34 +123,9 @@ function showToast(message, type = "success", duration = 3000) {
   }, duration);
 }
 
-// const addEditModal = async (id, module_name, module_function, formmethod) => {
-//   let url = id
-//     ? `${basePath}${module_name}/${id}/${module_function}`
-//     : `${basePath}${module_name}/${module_function}`;
-//   // alert(url);
-
-//   try {
-//     const response = await fetchData(url, {
-//       method: formmethod,
-//       headers: { "Content-Type": "text/html" },
-//     });
-//     const html = await response.text();
-//     const modalContent = document.querySelector("#modal-content");
-//     if (modalContent) {
-//       modalContent.innerHTML = html;
-//       $("#modal-sm").modal("show");
-//       attachModalEventListeners();
-//     } else {
-//       console.error('Element "#modal-content" not found.');
-//     }
-//   } catch (error) {
-//     alert("An error occurred. Please try again.");
-//   }
-// };
-
 const addEditModal = async (id, module_name, module_function, formmethod) => {
   let url = id
-    ? `${basePath}${module_name}/${id}/${module_function}`
+    ? `${basePath}${module_name}/${module_function}/${id}`
     : `${basePath}${module_name}/${module_function}`;
 
   try {
@@ -197,10 +149,4 @@ const addEditModal = async (id, module_name, module_function, formmethod) => {
     alert("An error occurred. Please try again.");
   }
 };
-
-// Function to handle the delete action
-
-
-// Event listener to trigger the deleteItem function on clicking the delete button
-
 

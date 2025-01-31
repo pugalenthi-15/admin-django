@@ -47,7 +47,6 @@ def login_view(request):
 
         return render(request, "modules/login.html")
 
-
 def logout_page(request):
     if request.user.is_authenticated:
         logout(request)
@@ -66,8 +65,17 @@ def users(request):
         "data": page_obj.object_list,  # List of user roles for the current page
         "page_obj": page_obj,  # The Page object to render pagination controls
     }
-    return render(request, "modules/masters/users.html", context)
+    return render(request, "modules/masters/users/users.html", context)
 
+def user_role(request):
+    page_obj = paginate_model(request, UserRole)
+
+    context = {
+        "page_title": "User Roles",
+        "data": page_obj.object_list,  # List of user roles for the current page
+        "page_obj": page_obj,  # The Page object to render pagination controls
+    }
+    return render(request, "modules/masters/users/user_role.html", context)
 
 def state(request):
     page_obj = paginate_model(request, State)
@@ -76,19 +84,17 @@ def state(request):
         "data": page_obj.object_list,  # List of user roles for the current page
         "page_obj": page_obj,  # The Page object to render pagination controls
     }
-    return render(request, "modules/masters/state.html", context)
-
+    return render(request, "modules/masters/state/index.html", context)
 
 def state_create(request):
     context = {
         "module_name": "State",
         "module_function": "Add",
         "method": "POST",
-        "route": "add-state",
+        "route": "store",
     }
     # print(context)
-    return render(request, "modules/masters/state/add.html", context)
-
+    return render(request, "modules/masters/state/add_edit.html", context)
 
 def add_state(request):
     if (
@@ -120,7 +126,6 @@ def add_state(request):
             {"status": "error", "message": f"An error occurred: {str(e)}"}, status=500
         )
 
-
 def state_edit(request, state_id):
     try:
         state = State.objects.get(id=state_id)
@@ -132,7 +137,7 @@ def state_edit(request, state_id):
             "data": state,
         }
         # print(context)
-        return render(request, "modules/masters/state/add.html", context)
+        return render(request, "modules/masters/state/add_edit.html", context)
     except State.DoesNotExist:
         return redirect("state_list")  # Redirect to the state list page if not found
 
@@ -172,7 +177,6 @@ def state_update(request, state_id):
         )
 
 def state_delete(request, state_id):
-    print("hai")
     if request.method == 'DELETE':
         try:
             item = State.objects.get(id=state_id)
@@ -182,17 +186,8 @@ def state_delete(request, state_id):
             return JsonResponse({'error': 'Item not found'}, status=404)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-def user_role(request):
-    page_obj = paginate_model(request, UserRole)
 
-    context = {
-        "page_title": "User Roles",
-        "data": page_obj.object_list,  # List of user roles for the current page
-        "page_obj": page_obj,  # The Page object to render pagination controls
-    }
-    return render(request, "modules/masters/user_role.html", context)
-
-
+# Helper Functions
 def paginate_model(request, model_class, per_page=10, select_related_fields=None):
     # Optionally include related foreign key data using select_related
     objects = model_class.objects.all().order_by("-id")
@@ -206,3 +201,5 @@ def paginate_model(request, model_class, per_page=10, select_related_fields=None
     page_obj = paginator.get_page(page_number)
 
     return page_obj
+
+
